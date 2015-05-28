@@ -1,13 +1,23 @@
 import maya.cmds as cmds
-
-# removes unicode to make a clean string e.g. u['obj'] = 'obj'
-def removeUnicode(unicode):
-     unicodeString = str(unicode)
-     return unicodeString[3:len(unicode)-3]
+import maya.mel as mel
 
 
-selected = cmds.ls(sl=True)
-currentObject = selected
-groupName = removeUnicode(currentObject) + "_attach"
+# select parent, then child object
+selectedPair = cmds.ls(sl=True)
+currentObject = selectedPair[1]
+currentParent = selectedPair[0]
 
-cmds.group( currentObject, n = groupName )
+# create attach group
+attachGroup = str(currentObject) + "_attach"
+cmds.group( currentObject, n = attachGroup)
+
+# center pivot of attach group
+cmds.select(attachGroup, r = True)
+mel.eval("CenterPivot")
+
+# select parent, select child, parent constraint options
+
+cmds.select( currentParent, r=True )
+cmds.select( attachGroup, add=True )
+
+mel.eval("ParentConstraintOptions")
